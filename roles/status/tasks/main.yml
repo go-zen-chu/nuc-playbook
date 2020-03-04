@@ -1,0 +1,8 @@
+- name: check partions info
+  parted:
+    device: /dev/sda
+    state: info
+  register: partition_info
+
+- debug:
+    msg: "{{ partition_info }}"

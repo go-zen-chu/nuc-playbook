@@ -1,4 +1,15 @@
+---
+- name: install parted
+  pacman:
+    name: parted
+    state: present
+
 - name: install vim
   pacman:
     name: vim
+    state: present
+
+- name: install which
+  pacman:
+    name: which
     state: present

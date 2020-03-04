@@ -13,3 +13,11 @@ Programs below should be installed & enabled
 - sshd: ansible uses for ssh
 - python: ansible uses when running playbook
 - dhcpcd: network connection from ansible origin is required
+
+## Run
+
+```bash
+# edit according to your env
+$ vim hosts.yml
+$ ansible-playbook -i hosts.yml site.yml
+```
