@@ -1,4 +1,3 @@
----
 - name: install parted
   pacman:
     name: parted
@@ -13,3 +12,9 @@
   pacman:
     name: which
     state: present
+
+- name: install zsh
+  pacman:
+    name: zsh
+    state: present
+  

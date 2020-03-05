@@ -1,0 +1,58 @@
+- name: install openssh (includes sshd)
+  pacman:
+    name: openssh
+    state: present
+
+- name: install sudo
+  pacman:
+    name: sudo
+    state: present
+
+- name: Add ansible user 
+  user:
+    name: ansible
+    group: wheel
+    password: "{{ password_ansible }}"
+  become: True
+
+- name: Add amasuda
+  user:
+    name: amasuda
+    shell: /usr/bin/zsh
+    group: wheel
+    password: "{{ password_amasuda }}"
+  become: True
+
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+
+- name: Change port of sshd
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^Port"
+    line: "Port {{ sshd_port }}"
+
+- name: Allow only wheel users to ssh
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^AllowGroups"
+    line: "AllowGroups wheel"
+
+- name: Allow wheel group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: "^%wheel"
+    line: "%wheel ALL=(ALL) NOPASSWD: ALL"
+  become: True
+
+- name: Disallow root SSH access
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin no"
+    state: present
+  notify: restart sshd
+  become: True

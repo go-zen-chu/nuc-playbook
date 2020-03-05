@@ -3,6 +3,7 @@
     device: /dev/sda
     state: info
   register: partition_info
+  become: True
 
 - debug:
     msg: "{{ partition_info }}"

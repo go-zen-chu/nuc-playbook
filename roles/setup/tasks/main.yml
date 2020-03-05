@@ -1,0 +1,3 @@
+# run setup tasks
+- import_tasks: lib.yml
+- import_tasks: auth.yml
