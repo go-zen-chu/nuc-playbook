@@ -1,0 +1,8 @@
+- name: install docker
+  pacman:
+    name: docker
+    state: present
+- name: install minikube
+  pacman:
+    name: minikube
+    state: present

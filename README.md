@@ -1,6 +1,6 @@
 # nuc-playbook
 
-playbook for my NUC setup.
+Playbook for my NUC setup.
 
 ## structure
 
@@ -8,7 +8,7 @@ Follows [best practice structure](https://docs.ansible.com/ansible/latest/user_g
 
 ## Prerequisite
 
-Programs below should be installed & enabled
+Programs below should be installed to the target manually.
 
 - sshd: ansible uses for ssh
 - python: ansible uses when running playbook
