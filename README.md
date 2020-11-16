@@ -27,3 +27,10 @@ $ ansible-playbook -i hosts.yml site.yml
 ```
 
 On the first run, it disables ssh login with root user but creates ansible user instead for security.
+
+## How ansible runs
+
+ansible-playbook command runs with root user.
+
+- root: can do anything. make it simple
+- ansible: non root application user. used for ssh login or running non root application.

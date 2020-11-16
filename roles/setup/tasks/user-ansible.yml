@@ -1,3 +1,4 @@
+# setup ansible user specific configs
 - name: copy bash profile for ansible user
   copy:
     src: .bash_profile
@@ -6,5 +7,5 @@
     owner: ansible
 
 # load bash_profile for following processes
-- name: source .bash_profile
-  shell: source /home/ansible/.bash_profile
+#- name: source .bash_profile
+#  shell: source /home/ansible/.bash_profile
