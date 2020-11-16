@@ -1,3 +1,9 @@
+# setup auth settings
+- name: update pacman cache (pacman -Sy)
+  pacman:
+    update_cache: yes
+  become: True
+
 - name: install openssh (includes sshd)
   pacman:
     name: openssh
@@ -8,27 +14,19 @@
     name: sudo
     state: present
 
-- name: Add ansible user 
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+
+- name: Make ansible user 
   user:
     name: ansible
     group: wheel
     password: "{{ password_ansible }}"
   become: True
 
-- name: Add amasuda
-  user:
-    name: amasuda
-    shell: /usr/bin/zsh
-    group: wheel
-    password: "{{ password_amasuda }}"
-  become: True
-
-- name: Make sure we have a 'wheel' group
-  group:
-    name: wheel
-    state: present
-
-- name: Change port of sshd
+- name: Change port of sshd for security
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: "^Port"

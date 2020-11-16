@@ -1,0 +1,34 @@
+# setup according to your environment
+- name: Add amasuda
+  user:
+    name: amasuda
+    shell: /usr/bin/zsh
+    group: wheel
+    password: "{{ password_amasuda }}"
+  become: True
+
+- name: create github ssh key dir
+  file:
+    path: /home/amasuda/.ssh/github
+    state: directory
+    owner: amasuda
+    group: wheel
+  become: True
+
+- name: write private key from var
+  copy:
+    dest: /home/amasuda/.ssh/github/id_rsa
+    content: "{{github_private_key_amasuda}}"
+    owner: amasuda
+    group: wheel
+    mode: "0400"
+  become: True
+
+- name: write public key from var
+  copy:
+    dest: /home/amasuda/.ssh/github/id_rsa_pub
+    content: "{{github_public_key_amasuda}}"
+    owner: amasuda
+    group: wheel
+    mode: "0400"
+  become: True

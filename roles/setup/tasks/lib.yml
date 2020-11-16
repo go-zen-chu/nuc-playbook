@@ -1,21 +1,34 @@
+- name: update pacman cache (pacman -Sy)
+  pacman:
+    update_cache: yes
+  become: True
+
 - name: install parted
   pacman:
     name: parted
     state: present
+
 - name: install vim
   pacman:
     name: vim
     state: present
+
 - name: install which
   pacman:
     name: which
     state: present
+
 - name: install git
   pacman:
     name: git
     state: present
+
 - name: install zsh
   pacman:
     name: zsh
     state: present
-  
+
+- name: install golang
+  pacman:
+    name: go
+    state: present
