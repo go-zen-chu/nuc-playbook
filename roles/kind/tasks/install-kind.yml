@@ -1,0 +1,40 @@
+# install kind
+- name: install golang
+  pacman:
+    name: go
+    state: present
+
+- name: install docker
+  pacman:
+    name: docker
+    state: present
+
+- name: Add ansible user to docker group
+  user:
+    name: ansible
+    groups: wheel, docker
+    password: "{{ password_ansible }}"
+  become: True
+
+- name: install kubectl
+  pacman:
+    name: kubectl
+    state: present
+
+# https://kind.sigs.k8s.io/docs/user/quick-start/
+- name: install kind
+  shell:
+    cmd: go get sigs.k8s.io/kind@v0.9.0
+  environment:
+    GO111MODULE: "on"
+  become: True
+  become_user: ansible
+
+#- name: check kind is installed
+#  shell:
+#    cmd: $(go env GOPATH)/bin/kind --version
+#
+#- name: create kind cluster
+#  shell:
+#    cmd: $(go env GOPATH)/bin/kind create cluster
+#  become: True
