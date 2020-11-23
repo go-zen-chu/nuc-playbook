@@ -5,6 +5,7 @@ metadata:
   name: node-exporter
   namespace: monitoring
 spec:
+  # selector にマッチした pod へリクエストが送られる
   selector:
     app: node-exporter
   ports:
@@ -18,15 +19,15 @@ metadata:
   name: node-exporter
   namespace: monitoring
   labels:
-    name: node-exporter
+    app: node-exporter
 spec:
   selector:
     matchLabels:
-      name: node-exporter
+      app: node-exporter
   template:
     metadata:
       labels:
-        name: node-exporter
+        app: node-exporter
       annotations:
          prometheus.io/scrape: "true"
          prometheus.io/port: "9100"
