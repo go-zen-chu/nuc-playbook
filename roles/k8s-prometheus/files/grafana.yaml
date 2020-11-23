@@ -1,0 +1,65 @@
+# setup ingress, service config
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  selector:
+    app: grafana
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: monitoring
+  annotations:
+    # rewrite url after /prometheus/xxx -> /xxx for prometheus
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /grafana(/|$)(.*)
+        pathType: Prefix
+        backend:
+          serviceName: grafana
+          servicePort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: grafana
+  name: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - image: grafana/grafana:7.3.3
+        name: grafana
+        ports:
+        - containerPort: 3000
+          name: http
+        volumeMounts:
+          - name: grafana-storage
+            mountPath: /var/lib/grafana
+      volumes:
+        - name: grafana-storage
+          persistentVolumeClaim:
+            claimName: grafana-storage
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        fsGroup: 472

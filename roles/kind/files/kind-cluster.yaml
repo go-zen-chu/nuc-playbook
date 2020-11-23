@@ -1,0 +1,24 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  # ingress
+  - containerPort: 80
+    hostPort: 80
+    #listenAddress: "127.0.0.1" # default is 0.0.0.0
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    #listenAddress: "127.0.0.1" # default is 0.0.0.0
+    protocol: TCP
+- role: worker
+networking:
+  apiServerAddress: "192.168.3.4" # open to public (これが kube config の CA の common name に使われる）
+  apiServerPort: 45382 # specify port to use for master
