@@ -9,7 +9,7 @@ spec:
     app: grafana
   ports:
   - protocol: TCP
-    port: 80
+    port: 3000
     targetPort: 3000
 ---
 apiVersion: networking.k8s.io/v1beta1
@@ -28,7 +28,64 @@ spec:
         pathType: Prefix
         backend:
           serviceName: grafana
-          servicePort: 80
+          servicePort: 3000
+---
+# https://grafana.com/docs/grafana/latest/administration/provisioning/
+# should be mounted to /etc/grafana/provisioning/datasources
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource-config
+  namespace: monitoring
+data:
+  datasource.yml: |
+    # config file version
+    apiVersion: 1
+    # list of datasources that should be deleted from the database
+    deleteDatasources:
+      - name: Prometheus
+        orgId: 1
+    # list of datasources to insert/update depending whats available in the database
+    datasources:
+    # <string, required> name of the datasource. Required
+    - name: Prometheus
+      # <string, required> datasource type. Required
+      type: prometheus
+      # <string, required> access mode. direct or proxy. Required
+      access: proxy
+      # <int> org id. will default to orgId 1 if not specified
+      orgId: 1
+      # <string> url
+      url: http://prometheus.monitoring.svc.cluster.local:9090
+      # <string> database password, if used
+      password:
+      # <string> database user, if used
+      user:
+      # <string> database name, if used
+      database:
+      # <bool> enable/disable basic auth
+      basicAuth: false
+      # <string> basic auth username, if used
+      basicAuthUser:
+      # <string> basic auth password, if used
+      basicAuthPassword:
+      # <bool> enable/disable with credentials headers
+      withCredentials:
+      # <bool> mark as default datasource. Max one per org
+      isDefault: true
+      # <map> fields that will be converted to json and stored in json_data
+      jsonData:
+        graphiteVersion: "1.1"
+        tlsAuth: false
+        tlsAuthWithCACert: false
+      # <string> json object of data that will be encrypted.
+      secureJsonData:
+        tlsCACert: "..."
+        tlsClientCert: "..."
+        tlsClientKey: "..."
+      version: 1
+      # <bool> allow users to edit datasources from the UI.
+      editable: true
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -54,9 +111,40 @@ spec:
         - containerPort: 3000
           name: http
         volumeMounts:
-          - name: grafana-storage
-            mountPath: /var/lib/grafana
+        - name: datasource-config-volume
+          mountPath: /etc/grafana/provisioning/datasources/
+        env:
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: "true"
+        - name: GF_SERVER_ROOT_URL
+          value: "http://localhost:80/grafana"
+        - name: GF_SERVER_SERVE_FROM_SUB_PATH
+          value: "true"
+        - name: GF_INSTALL_PLUGINS
+          value: grafana-clock-panel,grafana-simple-json-datasource
       volumes:
-        - name: grafana-storage
-          persistentVolumeClaim:
-            claimName: grafana-storage
+      - name: datasource-config-volume
+        configMap:
+          name: grafana-datasource-config
+---
+
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: grafana-dashboards-providers
+#   namespace: monitoring
+#   labels:
+#     app: grafana
+# data:
+#   dashboards-providers.yaml: |
+#     apiVersion: 1
+#     providers:
+#     - name: 'dashboards'
+#       orgId: 1
+#       folder: ''
+#       type: file
+#       disableDeletion: true
+#       editable: false
+#       options:
+#         path: /var/lib/grafana/dashboards
+#         foldersFromFilesStructure: true
