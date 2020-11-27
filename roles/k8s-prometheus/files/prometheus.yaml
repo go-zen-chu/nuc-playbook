@@ -102,10 +102,6 @@ data:
       static_configs:
       - targets: ['localhost:9090']
     
-    - job_name: 'node-exporter'
-      static_configs:
-      - targets: ['node-exporter.monitoring.svc.cluster.local:9100']
-    
     - job_name: 'kubernetes-apiservers'
       scheme: https
       tls_config:
@@ -115,7 +111,8 @@ data:
       kubernetes_sd_configs:
       - role: endpoints
       # Keep only the default/kubernetes service endpoints for the https port. This
-      # will add targets for each API server which Kubernetes adds an endpoint to # the default/kubernetes service.
+      # will add targets for each API server which Kubernetes adds an endpoint to
+      # the default/kubernetes service.
       relabel_configs:
       - source_labels: [component]
         regex: (.*)

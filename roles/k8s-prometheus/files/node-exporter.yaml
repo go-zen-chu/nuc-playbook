@@ -4,6 +4,7 @@ kind: Service
 metadata:
   name: node-exporter
   namespace: monitoring
+  prometheus.io/scrape: "true"
 spec:
   # selector にマッチした pod へリクエストが送られる
   selector:
