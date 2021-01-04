@@ -1,1 +1,3 @@
 - import_tasks: install-kind.yml
+- import_tasks: create-kind-cluster.yml
+- import_tasks: apply-k8s-manifests.yml

@@ -1521,7 +1521,7 @@ data:
         }
       ],
       "time": {
-        "from": "now-7d",
+        "from": "now-3d",
         "to": "now"
       },
       "timepicker": {

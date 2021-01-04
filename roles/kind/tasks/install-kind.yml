@@ -30,13 +30,8 @@
   become: True
   become_user: ansible
 
-#- name: check kind is installed
-#  shell:
-#    cmd: $(go env GOPATH)/bin/kind --version
-#
-#- name: create kind cluster
-#  shell:
-#    cmd: $(go env GOPATH)/bin/kind create cluster
-#  become: True
-
-
+- name: check kind is installed
+  shell:
+    cmd: $(go env GOPATH)/bin/kind --version
+  register: kind_version_result
+  failed_when: '"kind version 0.9.0" != kind_version_result.stdout'

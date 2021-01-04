@@ -2032,7 +2032,7 @@ data:
         }
       ],
       "time": {
-        "from": "now-5m",
+        "from": "now-1d",
         "to": "now"
       },
       "timepicker": {

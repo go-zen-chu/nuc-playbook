@@ -20,5 +20,7 @@ nodes:
     protocol: TCP
 - role: worker
 networking:
-  apiServerAddress: "192.168.3.4" # open to public (これが kube config の CA の common name に使われる）
-  apiServerPort: 45382 # specify port to use for master
+  # open to public (this ip is used for kube config CA's common name)
+  apiServerAddress: {{ host_ip }}
+  # specify port to use for kube-apiserver
+  apiServerPort: {{ kind_apiserver_port }} 

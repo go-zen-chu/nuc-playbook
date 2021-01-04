@@ -1,0 +1,18 @@
+- name: Make sure destination dir exists
+  file:
+    path: /home/ansible/kind
+    state: directory
+    recurse: yes
+
+- name: create kind cluster yaml
+  template:
+    src: kind-cluster.yml.j2
+    dest: /home/ansible/kind/kind-cluster.yml
+
+- name: create kind cluster (ignore when already exists)
+  shell:
+    cmd: $(go env GOPATH)/bin/kind create cluster --config /home/ansible/kind/kind-cluster.yml
+  register: create_cluster_result
+  failed_when:
+  - '"node(s) already exist for a cluster" not in create_cluster_result.stderr'
+  - 'create_cluster_result is not 0'
