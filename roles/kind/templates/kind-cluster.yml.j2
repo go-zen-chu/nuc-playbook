@@ -1,0 +1,26 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  # ingress
+  - containerPort: 80
+    hostPort: 80
+    #listenAddress: "127.0.0.1" # default is 0.0.0.0
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    #listenAddress: "127.0.0.1" # default is 0.0.0.0
+    protocol: TCP
+- role: worker
+networking:
+  # open to public (this ip is used for kube config CA's common name)
+  apiServerAddress: {{ host_ip }}
+  # specify port to use for kube-apiserver
+  apiServerPort: {{ kind_apiserver_port }} 
