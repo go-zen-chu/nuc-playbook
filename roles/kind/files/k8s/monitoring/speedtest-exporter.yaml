@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: speedtest-exporter
+  namespace: monitoring
+spec:
+  selector:
+    app: speedtest-exporter
+  ports:
+  - protocol: TCP
+    port: 9112
+    targetPort: 9112
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: speedtest-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: speedtest-exporter
+  template:
+    metadata:
+      labels:
+        app: speedtest-exporter
+      annotations:
+        # annotations for sd in prometheus
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9112"
+    spec:
+      containers:
+      - name: speedtest-exporter
+        image: nlamirault/speedtest_exporter:0.3.0
+        ports:
+        - containerPort: 9112

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: grafana-node-exporter-dashboard-config
+  name: grafana-dashboard-node-exporter-config
   namespace: monitoring
   labels:
     app: grafana

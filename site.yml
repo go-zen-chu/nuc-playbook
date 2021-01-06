@@ -1,5 +1,6 @@
 - hosts: all
   roles:
-    - setup
-    - kind
-    - status
+    - role: setup
+    - role: kind
+      tags: k8s
+    - role: status
