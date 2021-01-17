@@ -97,9 +97,7 @@ data:
     - job_name: 'prometheus'
       static_configs:
       - targets: ['localhost:9090']
-    - job_name: 'node-exporter'
-      static_configs:
-      - targets: ['node-exporter.monitoring.svc.cluster.local:9100']
+    
     - job_name: 'kubernetes-nodes'
       scheme: https
       tls_config:
@@ -125,6 +123,7 @@ data:
       - source_labels: [__name__]
         action: drop
         regex: 'reflector_.+?'
+    
     # Scrape config for pods
     # The relabeling allows the actual pod scrape endpoint to be configured via the
     # following annotations:
@@ -172,11 +171,37 @@ data:
       - source_labels: [__meta_kubernetes_pod_node_name]
         action: replace
         target_label: instance
-      - source_labels: [kubernetes_pod_name]
+    
+    # Scrape config for speedtest exporter
+    # global scrape interval 1m is too short for speedtest exporter
+    - job_name: 'speedtest-exporter'
+      scrape_interval: 5m
+      scrape_timeout: 2m
+      tls_config:
+        insecure_skip_verify: true
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - source_labels: [component]
+        regex: (.*)
+        target_label: component
+        replacement: kubernetes
+      # keep label if pod name starts with speedtest-exporter
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: keep
+        regex: (speedtest-exporter.*)
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
         action: replace
-        regex: pod-network-problem-detector-.+
-        replacement: ''
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
         target_label: kubernetes_pod_name
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        action: replace
+        target_label: instance
+
     # Scrape config for service endpoints.
     #
     # The relabeling allows the actual service scrape endpoint to be configured
@@ -228,6 +253,7 @@ data:
       - source_labels: [__name__]
         action: drop
         regex: 'kube_pod_container_status_waiting_reason|kube_pod_container_status_terminated_reason'
+    
     # Scrape config for Kubernetes API Server
     - job_name: 'kubernetes-apiservers'
       scheme: https
@@ -248,6 +274,7 @@ data:
       - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
         action: keep
         regex: default;kubernetes;https
+    
     # Scrape config for Kubelet cAdvisor.
     # This is required for Kubernetes 1.7.3 and later, where cAdvisor metrics
     # (those whose names begin with 'container_') have been removed from the
