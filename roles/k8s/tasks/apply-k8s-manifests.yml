@@ -1,11 +1,16 @@
 # apply k8s manifests
 - name: copy k8s manifests
   copy:
-    src: ./k8s/
+    src: ./
     dest: /home/ansible/k8s
     owner: ansible
     group: wheel
   become: True
+
+- name: generate prometheus configmap
+  template:
+    src: prometheus-configmap.yaml.j2
+    dest: /home/ansible/k8s/monitoring/prometheus-configmap.yaml
 
 - name: apply k8s setup manifest
   shell:
