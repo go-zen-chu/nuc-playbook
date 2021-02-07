@@ -1,75 +1,3 @@
-# setting for prometheus service account can check pods status
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: prometheus
-rules:
-- apiGroups: [""]
-  resources:
-  - nodes
-  - nodes/proxy
-  - services
-  - endpoints
-  - pods
-  verbs: ["get", "list", "watch"]
-- apiGroups:
-  - extensions
-  resources:
-  - ingresses
-  verbs: ["get", "list", "watch"]
-- nonResourceURLs: ["/metrics"]
-  verbs: ["get"]
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: prometheus
-  namespace: monitoring
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: prometheus
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: prometheus
-subjects:
-- kind: ServiceAccount
-  name: prometheus
-  namespace: monitoring
----
-# setup ingress, service config
-apiVersion: v1
-kind: Service
-metadata:
-  name: prometheus
-  namespace: monitoring
-spec:
-  selector:
-    app: prometheus
-  ports:
-  - protocol: TCP
-    port: 9090
-    targetPort: 9090 # set prometheus container port
----
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  name: prometheus-ingress
-  namespace: monitoring
-  annotations:
-    # rewrite url after /prometheus/xxx -> /xxx for prometheus
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /prometheus(/|$)(.*)
-        pathType: Prefix
-        backend:
-          serviceName: prometheus
-          servicePort: 9090
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -89,15 +17,59 @@ data:
     #     - targets:
     #       - alertmanager:9093
     # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
-    rule_files:
+    # rule_files:
     # - "first_rules.yml"
     # - "second_rules.yml"
-    # Scrape config for nodes
     scrape_configs:
+    # Scrape prometheus itself
     - job_name: 'prometheus'
       static_configs:
       - targets: ['localhost:9090']
-    
+    # Scrape config for speedtest exporter
+    - job_name: 'speedtest-exporter'
+      scrape_interval: 5m   # TIPS: global scrape interval 1m is too short for speedtest exporter
+      scrape_timeout: 2m
+      tls_config:
+        insecure_skip_verify: true
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      # keep label if pod name starts with speedtest-exporter
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: keep
+        regex: (speedtest-exporter.*)
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      # remove invaluable labels
+      - action: labeldrop
+        regex: (pod_template_generation|.*_template_hash|.*_revision_hash)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        action: replace
+        target_label: instance
+    # Check local network health status
+    - job_name: 'blackbox-exporter'
+      metrics_path: /probe
+      params:
+        module: [tcp_connect]
+      static_configs:
+      - targets:
+        - {{blackbox_tcp_nas_smb_target}} # check NAS's samba is working
+        - {{blackbox_tcp_nas_ssh_target}} # check NAS's ssh port is open
+      relabel_configs:
+      # change instance, target to blackbox's target
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter.monitoring.svc.cluster.local:9115
+    # Scrape all kubernetes nodes
     - job_name: 'kubernetes-nodes'
       scheme: https
       tls_config:
@@ -123,7 +95,6 @@ data:
       - source_labels: [__name__]
         action: drop
         regex: 'reflector_.+?'
-    
     # Scrape config for pods
     # The relabeling allows the actual pod scrape endpoint to be configured via the
     # following annotations:
@@ -162,6 +133,9 @@ data:
         target_label: __address__
       - action: labelmap
         regex: __meta_kubernetes_pod_label_(.+)
+      # remove invaluable labels
+      - action: labeldrop
+        regex: (pod_template_generation|.*_template_hash|.*_revision_hash)
       - source_labels: [__meta_kubernetes_namespace]
         action: replace
         target_label: kubernetes_namespace
@@ -171,37 +145,6 @@ data:
       - source_labels: [__meta_kubernetes_pod_node_name]
         action: replace
         target_label: instance
-    
-    # Scrape config for speedtest exporter
-    # global scrape interval 1m is too short for speedtest exporter
-    - job_name: 'speedtest-exporter'
-      scrape_interval: 5m
-      scrape_timeout: 2m
-      tls_config:
-        insecure_skip_verify: true
-      kubernetes_sd_configs:
-      - role: pod
-      relabel_configs:
-      - source_labels: [component]
-        regex: (.*)
-        target_label: component
-        replacement: kubernetes
-      # keep label if pod name starts with speedtest-exporter
-      - source_labels: [__meta_kubernetes_pod_name]
-        action: keep
-        regex: (speedtest-exporter.*)
-      - action: labelmap
-        regex: __meta_kubernetes_pod_label_(.+)
-      - source_labels: [__meta_kubernetes_namespace]
-        action: replace
-        target_label: kubernetes_namespace
-      - source_labels: [__meta_kubernetes_pod_name]
-        action: replace
-        target_label: kubernetes_pod_name
-      - source_labels: [__meta_kubernetes_pod_node_name]
-        action: replace
-        target_label: instance
-
     # Scrape config for service endpoints.
     #
     # The relabeling allows the actual service scrape endpoint to be configured
@@ -253,7 +196,6 @@ data:
       - source_labels: [__name__]
         action: drop
         regex: 'kube_pod_container_status_waiting_reason|kube_pod_container_status_terminated_reason'
-    
     # Scrape config for Kubernetes API Server
     - job_name: 'kubernetes-apiservers'
       scheme: https
@@ -274,7 +216,6 @@ data:
       - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
         action: keep
         regex: default;kubernetes;https
-    
     # Scrape config for Kubelet cAdvisor.
     # This is required for Kubernetes 1.7.3 and later, where cAdvisor metrics
     # (those whose names begin with 'container_') have been removed from the
@@ -312,63 +253,3 @@ data:
       - source_labels: [__name__]
         action: drop
         regex: 'container_(tasks_state|memory_failures_total|memory_failcnt)'
----
-# Finally, deployment for deploying prometheus
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: prometheus
-  namespace: monitoring
-  labels:
-    app: prometheus
-spec:
-  replicas: 1
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
-  selector:
-    matchLabels:
-      app: prometheus
-  template:
-    metadata:
-      labels:
-        app: prometheus
-      annotations:
-        # annotations for sd in prometheus
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9090"
-    spec:
-      serviceAccountName: prometheus # specify service account for service discovery
-      containers:
-      - name: prometheus
-        image: quay.io/prometheus/prometheus:v2.22.2
-        imagePullPolicy: IfNotPresent
-        args:
-          - '--storage.tsdb.retention.size=100GB' # set size based metrics storage
-          - '--storage.tsdb.path=/prometheus'
-          - '--config.file=/etc/prometheus/prometheus.yml'
-          - '--web.external-url=http://localhost:80/prometheus' # for nginx proxy
-          - '--web.route-prefix=/'
-        command:
-        - /bin/prometheus
-        ports:
-        - name: web
-          containerPort: 9090
-        volumeMounts:
-        # mount prometheus config to the path below
-        - name: config-volume
-          mountPath: /etc/prometheus
-        - name: data
-          mountPath: /prometheus
-      restartPolicy: Always
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
-      volumes:
-      - name: config-volume
-        configMap:
-          name: prometheus-config
-      # where metrics data stored
-      - name: data
-        emptyDir: {}

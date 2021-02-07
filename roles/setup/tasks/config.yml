@@ -1,13 +1,13 @@
 - name: Update timesyncd config (main NTP)
   lineinfile:
-    dest: /etc/ssh/sshd_config
+    dest: /etc/systemd/timesyncd.conf
     regexp: "^#NTP="
     line: "NTP=time.google.com"
   become: True
 
 - name: Update timesyncd config (fallback NTP)
   lineinfile:
-    dest: /etc/ssh/sshd_config
+    dest: /etc/systemd/timesyncd.conf
     regexp: "^#FallbackNTP"
     line: "FallbackNTP=0.arch.pool.ntp.org 1.arch.pool.ntp.org 2.arch.pool.ntp.org 3.arch.pool.ntp.org"
   become: True
