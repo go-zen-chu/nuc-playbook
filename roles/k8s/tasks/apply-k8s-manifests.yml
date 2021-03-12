@@ -28,4 +28,16 @@
 - name: apply k8s monitoring manifest
   shell:
     cmd: /usr/bin/kubectl apply -f /home/ansible/k8s/monitoring
-  
+
+- name: generate kustomization file for sandbox namespace
+  template:
+    src: sandbox-kustomization.yaml.j2
+    dest: /home/ansible/k8s/sandbox/kustomization.yaml
+
+- name: apply kustomization for sandbox namespace
+  shell:
+    cmd: /usr/bin/kubectl apply -k /home/ansible/k8s/sandbox/
+
+- name: apply sandbox manifest
+  shell:
+    cmd: /usr/bin/kubectl apply -f /home/ansible/k8s/sandbox 

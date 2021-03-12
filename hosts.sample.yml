@@ -1,0 +1,21 @@
+all:
+  hosts:
+    nuc:
+      ansible_host: 192.168.1.1
+      ansible_user: ansible
+      ansible_port: 20000
+  vars:
+    host_ip: 192.168.1.1
+    sshd_port: 12345
+    password_ansible: xxx
+    kind_apiserver_port: 12344
+    password_amasuda: xxx
+    blackbox_tcp_nas_smb_target: "192.168.1.1:445"
+    blackbox_tcp_nas_ssh_target: "192.168.1.1:11111"
+    mysql_password: xxx
+    github_private_key_amasuda: |
+      -----BEGIN RSA PRIVATE KEY-----
+      xxx
+      -----END RSA PRIVATE KEY-----
+    github_public_key_amasuda: |
+      ssh-rsa yyyy
