@@ -1,4 +1,3 @@
-# manifest to be applied first (e.g. setup namespace,...)
 apiVersion: v1
 kind: Namespace
 metadata:

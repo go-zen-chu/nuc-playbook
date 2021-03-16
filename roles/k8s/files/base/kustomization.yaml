@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# apply namespace first
+# specify other kustomization dir
+resources:
+- namespaces.yaml
+- monitoring/blackbox-exporter.yaml
+- monitoring/grafana-dashboard-etcd.yaml
+- monitoring/grafana-dashboard-kubernetes.yaml
+- monitoring/grafana-dashboard-node-exporter.yaml
+- monitoring/grafana-dashboard-prometheus.yaml
+- monitoring/grafana-dashboard-speedtest.yaml
+- monitoring/grafana.yaml
+- monitoring/node-exporter.yaml
+- monitoring/prometheus.yaml
+- monitoring/speedtest-exporter.yaml
+- sandbox/mysql.yaml
+#REPLACED BY ANSIBLE

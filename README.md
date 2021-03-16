@@ -28,6 +28,17 @@ $ ansible-playbook -i hosts.yml site.yml
 
 On the first run, it disables ssh login with root user but creates ansible user instead for security.
 
+### kubernetes deploy
+
+We use kustomize for applying manifest to k8s.
+Use following command when you want to add resources to kustomization.yaml file in base dir.
+
+```bash
+cd roles/k8s/files/base
+# declaritively add files to kustomization.yaml
+kustomize edit add resources/monitoring/*
+```
+
 ## How ansible runs
 
 ansible-playbook command runs with root user.
