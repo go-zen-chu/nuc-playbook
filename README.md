@@ -15,7 +15,11 @@ Programs below should be installed to the target manually before running this pl
 - dhcpcd: network connection from ansible origin is required
 
 ```bash
-pacman -S --noconfirm openssh python dhcpcd
+# on archlinux installed machine
+pacman -Sy --noconfirm openssh python dhcpcd
+
+# from your laptop, check connectivity
+nc -vz 192.168.x.x 22
 ```
 
 ## Run & setup
@@ -27,6 +31,17 @@ $ ansible-playbook -i hosts.yml site.yml
 ```
 
 On the first run, it disables ssh login with root user but creates ansible user instead for security.
+
+### kubernetes deploy
+
+We use kustomize for applying manifest to k8s.
+Use following command when you want to add resources to kustomization.yaml file in base dir.
+
+```bash
+cd roles/k8s/files/base
+# declaritively add files to kustomization.yaml
+kustomize edit add resources/monitoring/*
+```
 
 ## How ansible runs
 
