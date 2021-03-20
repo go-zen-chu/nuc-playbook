@@ -1,4 +1,9 @@
 # apply k8s manifests
+- name: clean k8s manifests if exists
+  file:
+    path: /home/ansible/k8s
+    state: absent
+
 - name: copy k8s manifests
   copy:
     src: ./
@@ -7,15 +12,6 @@
     group: wheel
   become: True
 
-- name: generate prometheus configmap
-  template:
-    src: prometheus-configmap.yaml.j2
-    dest: /home/ansible/k8s/monitoring/prometheus-configmap.yaml
-
-- name: apply k8s setup manifest
-  shell:
-    cmd: /usr/bin/kubectl apply -f /home/ansible/k8s/setup
-  
 - name: apply k8s ingress manifest
   shell:
     cmd: /usr/bin/kubectl apply -f /home/ansible/k8s/ingress
@@ -25,7 +21,22 @@
   - '"field is immutable" not in apply_ingress_result.stderr'
   - 'apply_ingress_result.rc is not 0'
 
-- name: apply k8s monitoring manifest
+- name: generate prometheus configmap
+  template:
+    src: prometheus-configmap.yaml.j2
+    dest: /home/ansible/k8s/base/monitoring/prometheus-configmap.yaml
+
+- name: Append secretGenerator to base kustomization.yaml
+  lineinfile:
+    dest: /home/ansible/k8s/base/kustomization.yaml
+    regexp: "^#REPLACED BY ANSIBLE"
+    line: |
+      secretGenerator:
+      - name: mysql-pass
+        namespace: sandbox
+        literals:
+        - password={{mysql_password}}
+
+- name: apply base kustomization.yaml
   shell:
-    cmd: /usr/bin/kubectl apply -f /home/ansible/k8s/monitoring
-  
+    cmd: /usr/bin/kubectl apply -k /home/ansible/k8s/base
