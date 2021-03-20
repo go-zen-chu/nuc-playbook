@@ -71,24 +71,15 @@ spec:
           serviceName: prometheus
           servicePort: 9090
 ---
-# Finally, deployment for deploying prometheus
-apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
+apiVersion: apps/v1beta1
 metadata:
   name: prometheus
-  namespace: monitoring
-  labels:
-    app: prometheus
 spec:
-  replicas: 1
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+  serviceName: prometheus
+  replicas: 2
+  updateStrategy:
     type: RollingUpdate
-  selector:
-    matchLabels:
-      app: prometheus
   template:
     metadata:
       labels:
@@ -118,7 +109,7 @@ spec:
         # mount prometheus config to the path below
         - name: config-volume
           mountPath: /etc/prometheus
-        - name: data
+        - name: prometheus-pvc
           mountPath: /prometheus
       restartPolicy: Always
       securityContext: {}
@@ -130,3 +121,13 @@ spec:
       # where metrics data stored
       - name: data
         emptyDir: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: prometheus-pvc
+    spec:
+      resources:
+        requests:
+          storage: 100Gi
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: nfs
