@@ -1,7 +1,0 @@
-- hosts: all
-  roles:
-    - role: setup
-    - role: kind
-    - role: k8s
-      tags: k8s
-    - role: status

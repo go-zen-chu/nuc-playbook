@@ -23,8 +23,3 @@
   pacman:
     name: zsh
     state: present
-
-- name: install golang
-  pacman:
-    name: go
-    state: present

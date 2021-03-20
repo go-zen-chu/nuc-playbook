@@ -17,17 +17,30 @@ Programs below should be installed to the target manually before running this pl
 ```bash
 # on archlinux installed machine
 pacman -Sy --noconfirm openssh python dhcpcd
+# set root password for sshd
+passwd
 
 # from your laptop, check connectivity
 nc -vz 192.168.x.x 22
 ```
 
-## Run & setup
+## setup
+
+At first, you need to setup your node.
 
 ```bash
 # edit according to your env
-$ vim hosts.yml
-$ ansible-playbook -i hosts.yml site.yml
+vim hosts.yml
+ansible-playbook -i hosts.yml initialize.yml
+```
+
+This will create ansible user to your node and configure ssh settings
+
+## Create kubernetes cluster
+
+```bash
+vim hosts.yml
+ansible-playbook -i hosts.yml site.yml
 ```
 
 On the first run, it disables ssh login with root user but creates ansible user instead for security.

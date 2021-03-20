@@ -19,11 +19,13 @@
     name: wheel
     state: present
 
+# Make sure create ansible user before restart sshd
 - name: Make ansible user 
   user:
     name: ansible
     group: wheel
-    password: "{{ password_ansible }}"
+    # make sure hash your password
+    password: "{{ password_ansible | password_hash('sha512') }}"
   become: True
 
 - name: Change port of sshd for security
