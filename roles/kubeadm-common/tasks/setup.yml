@@ -1,0 +1,35 @@
+# common setting https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+- name: set swapoff
+  command: swapoff -a
+  become: True
+
+# install libraries required for kubelet
+- name: install ebtables
+  pacman:
+    name: ebtables
+    state: present
+  become: True
+
+- name: install ethtool
+  pacman:
+    name: ethtool
+    state: present
+  become: True
+
+- name: install socat
+  pacman:
+    name: socat
+    state: present
+  become: True
+
+- name: install conntrack-tools
+  pacman:
+    name: conntrack-tools
+    state: present
+  become: True
+
+# prepare for AUR package https://wiki.archlinux.org/index.php/Arch_User_Repository for kubelet, kubeadm
+- name: install base-devel
+  pacman:
+    name: base-devel 
+    state: present
