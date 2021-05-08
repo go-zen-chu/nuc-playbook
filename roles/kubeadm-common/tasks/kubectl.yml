@@ -2,7 +2,7 @@
 - name: check if kubectl already exists
   stat:
     path: /usr/bin/kubectl
-    register: kubectl
+  register: kubectl
 
 - name: download kubectl if not exists
   shell:

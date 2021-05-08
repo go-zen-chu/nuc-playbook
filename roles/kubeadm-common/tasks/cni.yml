@@ -9,7 +9,7 @@
 - name: check if cni plugins already exists
   stat:
     path: /opt/cni/bin/bridge
-    register: cni_plugins
+  register: cni_plugins
 
 - name: download cni plugins if not exists
   shell:
