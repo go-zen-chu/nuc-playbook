@@ -1,0 +1,12 @@
+- name: start kubernetes control plane
+  shell:
+    cmd: kubeadm init --apiserver-advertise-address={{control_plane_ip} --pod-network-cidr=10.244.0.0/16
+  register: kubeadm_join_result
+  failed_when:
+  # get error
+  - kubeadm_join_result.rc != 0
+  # kubeadm join fails when already kubelet is started via kubeadm
+  - '/etc/kubernetes/kubelet.conf already exists' not in kubeadm_join_result.stderr 
+  - 'Port 10250 is in use' not in kubeadm_join_result.stderr 
+  become: True
+

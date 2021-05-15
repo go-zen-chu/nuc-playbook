@@ -1,4 +1,4 @@
 - hosts: k8s-workers
   roles:
-    #- role: kubeadm-common
+    - role: kubeadm-common
     - role: kubeadm-worker

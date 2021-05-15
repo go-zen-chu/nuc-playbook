@@ -1,4 +1,0 @@
-- hosts: k8s-controllers
-  roles:
-    - role: kubeadm-common
-    - role: kubeadm-controller

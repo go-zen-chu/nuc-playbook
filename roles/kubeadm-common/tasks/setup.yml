@@ -4,9 +4,10 @@
   become: True
 
 # install libraries required for kubelet
-- name: install ebtables
+# iptables is legacy version which is required for kube-proxy. DO NOT install iptables-nft
+- name: install iptables
   pacman:
-    name: ebtables
+    name: iptables
     state: present
   become: True
 
@@ -33,3 +34,4 @@
   pacman:
     name: base-devel 
     state: present
+  become: True
