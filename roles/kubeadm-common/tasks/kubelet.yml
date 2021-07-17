@@ -29,18 +29,4 @@
     enabled: True
     state: started
     name: kubelet
-
-# AFTER running kubelet, this setting is required when you use cri-o
-- name: set kubelet cgroup driver to systemd
-  lineinfile:
-    dest: /var/lib/kubelet/config.yaml
-    regexp: "^cgroupDriver: \"systemd\""
-    line: "cgroupDriver: \"systemd\""
   become: True
-
-- name: enable kubelet service
-  systemd:
-    daemon_reload: True
-    state: restarted
-    name: kubelet
-  

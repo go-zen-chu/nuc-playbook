@@ -10,3 +10,19 @@
   - "'/etc/kubernetes/kubelet.conf already exists' not in kubeadm_join_result.stderr"
   - "'Port 10250 is in use' not in kubeadm_join_result.stderr"
   become: True
+
+# AFTER running kubeadm, this setting is required when you use cri-o
+- name: set kubelet cgroup driver to systemd
+  lineinfile:
+    dest: /var/lib/kubelet/config.yaml
+    regexp: "^cgroupDriver: \"systemd\""
+    line: "cgroupDriver: \"systemd\""
+  become: True
+
+- name: enable kubelet service
+  systemd:
+    daemon_reload: True
+    state: restarted
+    name: kubelet
+  become: True
+  
