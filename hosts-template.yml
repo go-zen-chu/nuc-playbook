@@ -18,21 +18,21 @@ all:
     # kubernetes is a group of k8s components
     kubernetes:
       children:
-        k8s-control-planes:
+        k8s_control_planes:
           children:
-            control-plane1:
+            control_plane1:
               hosts:
-                machine:
+                machine_control_plane1:
                   ansible_host: ${ANSIBLE_CONTROL_PLANE1_ANSIBLE_HOST}
                   ansible_user: ansible
                   ansible_port: ${ANSIBLE_CONTROL_PLANE1_ANSIBLE_PORT}
               vars:
                 kubeadm_control_plane_node_name: control-plane-1
-        k8s-workers:
+        k8s_workers:
           children:
             worker1:
               hosts:
-                machine:
+                machine_worker1:
                   ansible_host: ${ANSIBLE_WORKER1_ANSIBLE_HOST}
                   ansible_user: ansible
                   ansible_port: ${ANSIBLE_WORKER1_ANSIBLE_PORT}
@@ -40,7 +40,7 @@ all:
                 kubeadm_worker_node_name: worker-1
             worker2:
               hosts:
-                machine:
+                machine_worker2:
                   ansible_host: ${ANSIBLE_WORKER2_ANSIBLE_HOST}
                   ansible_user: ansible
                   ansible_port: ${ANSIBLE_WORKER2_ANSIBLE_PORT}
@@ -55,4 +55,5 @@ all:
     sshd_port: ${ANSIBLE_SSHD_PORT}
     password_ansible: ${ANSIBLE_PASSWORD_ANSIBLE}
     kind_apiserver_port: ${ANSIBLE_KIND_APISERVER_PORT}
+    blackbox_tcp_nas_smb_target: ${ANSIBLE_BLACKBOX_TCP_NAS_SMB_TARGET}
     password_amasuda: ${ANSIBLE_PASSWORD_AMASUDA}
