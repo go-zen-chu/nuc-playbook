@@ -30,7 +30,13 @@ At first, you need to setup your node.
 
 ```bash
 # edit according to your env
-vim hosts.yml
+vim .envrc
+# if you use direnv then run below
+direnv allow .
+# if not run below
+source .envrc
+# envsubst read env vars and substitute them
+envsubst < hosts-template.yml > hosts.yml
 ansible-playbook -i hosts.yml initialize.yml
 ```
 
