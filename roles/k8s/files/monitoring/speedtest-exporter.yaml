@@ -33,6 +33,6 @@ spec:
     spec:
       containers:
       - name: speedtest-exporter
-        image: nlamirault/speedtest_exporter:0.3.0
+        image: registry.hub.docker.com/nlamirault/speedtest_exporter:0.3.0
         ports:
         - containerPort: 9112

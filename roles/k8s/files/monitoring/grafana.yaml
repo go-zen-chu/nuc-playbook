@@ -126,7 +126,7 @@ spec:
         app: grafana
     spec:
       containers:
-      - image: grafana/grafana:7.3.3
+      - image: registry.hub.docker.com/grafana/grafana:7.3.3
         name: grafana
         ports:
         - containerPort: 3000
