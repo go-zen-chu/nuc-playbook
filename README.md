@@ -19,9 +19,11 @@ Programs below should be installed to the target manually before running this pl
 pacman -Sy --noconfirm openssh python dhcpcd
 # set root password for sshd
 passwd
+# Add root login config to sshd. This config will be deleted after running initialize.yml
+echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 
 # from your laptop, check connectivity
-nc -vz 192.168.x.x 22
+ssh root@192.168.x.x 22
 ```
 
 ## setup
@@ -37,19 +39,17 @@ direnv allow .
 source .envrc
 # envsubst read env vars and substitute them
 envsubst < hosts-template.yml > hosts.yml
-ansible-playbook -i hosts.yml initialize.yml
+# specify a node you want to setup 
+ansible-playbook -i hosts.yml --limit node1 initialize.yml
 ```
 
-This will create ansible user to your node and configure ssh settings
+On the first run, it disables ssh login with root user but creates ansible user instead for security.
 
 ## Create kubernetes cluster
 
 ```bash
-vim hosts.yml
-ansible-playbook -i hosts.yml site.yml
+ansible-playbook -i hosts.yml k8s-contol-plane.yml
 ```
-
-On the first run, it disables ssh login with root user but creates ansible user instead for security.
 
 ### kubernetes deploy
 
