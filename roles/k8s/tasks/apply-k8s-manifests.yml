@@ -15,17 +15,16 @@
 - name: apply k8s setup manifest
   shell:
     cmd: /usr/bin/kubectl apply -f /home/ansible/k8s/setup
-  
-- name: apply k8s ingress manifest
+
+- name: apply workstation manifst
+  shell:
+    cmd: /usr/bin/kubectl apply -f /home/ansible/k8s/default/ws.yaml
+ 
+- name: apply ingress manifest
   shell:
     cmd: /usr/bin/kubectl apply -f /home/ansible/k8s/ingress
-  # TODO: fix manifest so that it can apply idempotently
-  register: apply_ingress_result
-  failed_when:
-  - '"field is immutable" not in apply_ingress_result.stderr'
-  - 'apply_ingress_result.rc is not 0'
 
-- name: apply k8s monitoring manifest
+- name: apply monitoring manifest
   shell:
     cmd: /usr/bin/kubectl apply -f /home/ansible/k8s/monitoring
   

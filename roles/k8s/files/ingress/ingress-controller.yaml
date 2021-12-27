@@ -1,4 +1,5 @@
-# https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.0/deploy/static/provider/cloud/deploy.yaml
+# use baremetal configuration that use NodePort to export port of the machine
+# https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.0/deploy/static/provider/baremetal/deploy.yaml
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -272,8 +273,7 @@ metadata:
   name: ingress-nginx-controller
   namespace: ingress-nginx
 spec:
-  type: LoadBalancer
-  externalTrafficPolicy: Local
+  type: NodePort
   ipFamilyPolicy: SingleStack
   ipFamilies:
     - IPv4
@@ -333,7 +333,6 @@ spec:
                   - /wait-shutdown
           args:
             - /nginx-ingress-controller
-            - --publish-service=$(POD_NAMESPACE)/ingress-nginx-controller
             - --election-id=ingress-controller-leader
             - --controller-class=k8s.io/ingress-nginx
             - --configmap=$(POD_NAMESPACE)/ingress-nginx-controller

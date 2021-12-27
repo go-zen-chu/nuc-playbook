@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ws
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ws
+  template:
+    metadata:
+      labels:
+        app: ws
+    spec:
+      containers:
+      - name: ws
+        image: registry.hub.docker.com/amasuda/ws:latest
+        # run process in container
+        command: ["sleep", "604800"]

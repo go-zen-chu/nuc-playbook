@@ -1,13 +1,10 @@
 - name: start kubernetes control plane
   shell:
-    cmd: kubeadm init --apiserver-advertise-address={{control_plane_ip} --pod-network-cidr=10.244.0.0/16
-  register: kubeadm_join_result
+    cmd: kubeadm init --control-plane-endpoint={{control_plane_ip}} --pod-network-cidr=10.244.0.0/16 --node-name=control-plane
+  register: kubeadm_init_result
   failed_when:
   # get error
-  - kubeadm_join_result.rc != 0
-  # kubeadm join fails when already kubelet is started via kubeadm
-  - '/etc/kubernetes/kubelet.conf already exists' not in kubeadm_join_result.stderr 
-  - 'Port 10250 is in use' not in kubeadm_join_result.stderr 
+  - kubeadm_init_result.rc != 0
   become: True
 
 # AFTER running kubeadm, this setting is required when you use cri-o
@@ -18,6 +15,7 @@
     line: "cgroupDriver: \"systemd\""
   become: True
 
+# TBD: daemon reload
 - name: enable kubelet service
   systemd:
     daemon_reload: True
@@ -25,3 +23,5 @@
     name: kubelet
   become: True
  
+# TBD: remove master taint
+#kubectl taint nodes control-plane node-role.kubernetes.io/master=:NoSchedule-

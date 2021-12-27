@@ -3,8 +3,17 @@
   command: modprobe overlay
   become: True
 
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
 - name: enable br_netfilter module
   command: modprobe br_netfilter
+  become: True
+
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/#cri-o
+- name: load module when machine started
+  copy:
+    src: crio.conf
+    dest: /etc/modules-load.d/crio.conf
+    mode: "0644"
   become: True
 
 - name: install cri-o

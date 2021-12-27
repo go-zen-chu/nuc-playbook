@@ -1,0 +1,7 @@
+# define things that are required before applying other manifests
+
+# namespace should be created BEFORE applying deployments
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring

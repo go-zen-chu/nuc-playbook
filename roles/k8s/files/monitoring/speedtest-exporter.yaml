@@ -8,8 +8,8 @@ spec:
     app: speedtest-exporter
   ports:
   - protocol: TCP
-    port: 9112
-    targetPort: 9112
+    port: 9798
+    targetPort: 9798
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -33,6 +33,6 @@ spec:
     spec:
       containers:
       - name: speedtest-exporter
-        image: registry.hub.docker.com/nlamirault/speedtest_exporter:0.3.0
+        image: ghcr.io/miguelndecarvalho/speedtest-exporter:v3.3.4
         ports:
-        - containerPort: 9112
+        - containerPort: 9798
