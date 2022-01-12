@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+      - name: ubuntu
+        # you cannot use registry.hub.docker.io for library images. you'll get unauthorized
+        # https://github.com/Azure/acr/issues/476#issuecomment-709894487
+        image: docker.io/library/ubuntu:20.04
+        # run process in container
+        command: ["sleep", "604800"]

@@ -12,6 +12,7 @@
   become: True
 
 # AFTER running kubeadm, this setting is required when you use cri-o
+# https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/configure-cgroup-driver/#configuring-the-kubelet-cgroup-driver
 - name: set kubelet cgroup driver to systemd
   lineinfile:
     dest: /var/lib/kubelet/config.yaml

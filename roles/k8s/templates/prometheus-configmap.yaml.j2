@@ -60,7 +60,6 @@ data:
       static_configs:
       - targets:
         - {{blackbox_tcp_nas_smb_target}} # check NAS's samba is working
-        - {{blackbox_tcp_nas_ssh_target}} # check NAS's ssh port is open
       relabel_configs:
       # change instance, target to blackbox's target
       - source_labels: [__address__]
