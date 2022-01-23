@@ -50,7 +50,11 @@ spec:
               mountPath: /rootfs
       # these tolerations are need for deploying to master, ingress
       tolerations:
+      # TODO: remove master toleration after k8s 1.24
       - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+        operator: Equal
+      - key: node-role.kubernetes.io/control-plane
         effect: NoSchedule
         operator: Equal
       - key: node-role.kubernetes.io/ingress
