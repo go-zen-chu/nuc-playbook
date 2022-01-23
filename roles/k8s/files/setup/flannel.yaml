@@ -163,6 +163,7 @@ spec:
       hostNetwork: true
       priorityClassName: system-node-critical
       tolerations:
+      # flannel is deployed to all nodes
       - operator: Exists
         effect: NoSchedule
       serviceAccountName: flannel

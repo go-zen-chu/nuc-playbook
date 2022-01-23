@@ -399,6 +399,10 @@ spec:
       nodeSelector:
         kubernetes.io/os: linux
       tolerations:
+        # TODO: remove master toleration after k8s 1.24
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+          operator: Equal
         - effect: NoSchedule
           key: node-role.kubernetes.io/control-plane
           operator: Equal
@@ -628,6 +632,10 @@ spec:
       nodeSelector:
         kubernetes.io/os: linux
       tolerations:
+        # TODO: remove master toleration after k8s 1.24
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+          operator: Equal
         - effect: NoSchedule
           key: node-role.kubernetes.io/control-plane
           operator: Equal
@@ -686,6 +694,10 @@ spec:
       nodeSelector:
         kubernetes.io/os: linux
       tolerations:
+        # TODO: remove master toleration after k8s 1.24
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+          operator: Equal
         - effect: NoSchedule
           key: node-role.kubernetes.io/control-plane
           operator: Equal
