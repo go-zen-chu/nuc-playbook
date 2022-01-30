@@ -1,6 +1,6 @@
 - name: start kubernetes control plane
   shell:
-    cmd: kubeadm init --control-plane-endpoint={{control_plane_ip}} --pod-network-cidr=10.244.0.0/16 --node-name={{kubeadm_control_plane_node_name}}
+    cmd: kubeadm init --control-plane-endpoint={{control_plane_ip}} --pod-network-cidr=10.244.0.0/16 --node-name={{kubeadm_control_plane_node_name}} --cri-socket=unix:///var/run/crio/crio.sock
   register: kubeadm_init_result
   failed_when:
   # get error
