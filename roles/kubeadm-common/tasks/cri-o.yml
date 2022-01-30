@@ -62,7 +62,7 @@
 - name: download crictl
   shell:
     cmd: |
-      CRICTL_VERSION="v1.16.0"
+      CRICTL_VERSION="v1.23.0"
       curl -L "https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz" | tar -C /usr/local/bin -xz
   when: not crictl.stat.exists
   become: True
